@@ -1,0 +1,20 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc libffi-dev && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY utils/ ./utils/
+COPY project/ ./project/
+
+ENV PYTHONPATH=/app/utils:/app
+ENV PYTHONUNBUFFERED=1
+
+ARG QUEUES=crawl_queue,analyze_queue,ai_queue,compose_queue,publish_queue,orchestrator_queue
+ENV QUEUES=${QUEUES}
+
+CMD ["sh", "-c", "celery -A mq_clients.celery_app:celery_app worker -Q ${QUEUES} --loglevel=info --concurrency=4"]

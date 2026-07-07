@@ -1,0 +1,15 @@
+[run]
+source =
+    utils
+    project
+omit =
+    */tests/*
+    */.venv/*
+    */__pycache__/*
+    */site-packages/*
+    */dist/*
+    */prototype/*
+
+[report]
+show_missing = True
+skip_covered = False

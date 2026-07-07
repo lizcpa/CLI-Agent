@@ -1,0 +1,12 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.backends._legacy:_Backend"
+
+[project]
+name = "prodvideo-shared"
+version = "0.1.0"
+description = "ProdVideo AI Factory - 共享工具包"
+requires-python = ">=3.11"
+
+[tool.setuptools.packages.find]
+include = ["common_sdk*", "db_clients*", "mq_clients*", "model_adapters*", "platform_connectors*"]

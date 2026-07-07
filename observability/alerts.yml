@@ -1,0 +1,33 @@
+groups:
+  - name: prodvideo-alerts
+    rules:
+      - alert: ServiceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Service {{ $labels.instance }} down"
+          description: "Prometheus target {{ $labels.job }} has been down for more than 1 minute."
+
+      - alert: HighErrorRate
+        expr: |
+          sum(rate(http_requests_total{status=~"5.."}[5m])) by (handler)
+          / sum(rate(http_requests_total[5m])) by (handler) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High 5xx error rate on {{ $labels.handler }}"
+          description: "Handler {{ $labels.handler }} has >5% 5xx errors for 5 minutes."
+
+      - alert: CrawlFailureRate
+        expr: |
+          sum(rate(crawl_jobs_total{status="failed"}[10m])) by (platform)
+          / sum(rate(crawl_jobs_total[10m])) by (platform) > 0.5
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Crawl failure rate > 50% for {{ $labels.platform }}"
+          description: "Platform {{ $labels.platform }} crawl failure rate exceeds 50% for 10 minutes."

@@ -1,0 +1,24 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc libffi-dev && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY utils/ ./utils/
+COPY project/ ./project/
+COPY database/ ./database/
+
+ARG SERVICE_DIR
+ARG SERVICE_PORT
+ENV SERVICE_DIR=${SERVICE_DIR}
+ENV SERVICE_PORT=${SERVICE_PORT}
+ENV PYTHONPATH=/app/utils:/app
+ENV PYTHONUNBUFFERED=1
+
+EXPOSE ${SERVICE_PORT}
+
+CMD ["sh", "-c", "uvicorn project.backend.${SERVICE_DIR}.main:app --host 0.0.0.0 --port ${SERVICE_PORT}"]
